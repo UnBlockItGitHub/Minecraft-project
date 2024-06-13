@@ -10,10 +10,20 @@ const chunk = new Chunk();
 chunk.draw(scene);
 
 const player = new Player(camera);
+scene.add(player.getObject());
+
+let lastTime = performance.now();
 
 function animate() {
     requestAnimationFrame(animate);
+
+    const currentTime = performance.now();
+    const delta = (currentTime - lastTime) / 1000; // Convert to seconds
+
+    player.update(delta);
+
     renderer.render(scene, camera);
+    lastTime = currentTime;
 }
 
 animate();
