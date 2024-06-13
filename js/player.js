@@ -1,7 +1,7 @@
 class Player {
     constructor(camera) {
         this.camera = camera;
-        this.moveSpeed = 0.1;
+        this.moveSpeed = 5; // Adjust speed as necessary
         this.turnSpeed = 0.002;
         this.velocity = new THREE.Vector3();
         this.direction = new THREE.Vector3();
@@ -11,12 +11,25 @@ class Player {
         this.yaw = new THREE.Object3D();
         this.yaw.add(this.pitch);
         this.yaw.position.y = 5;  // Set initial camera height
+        this.debugMode = false;
+        this.lastFrameTime = performance.now();
 
         document.addEventListener('keydown', this.onKeyDown.bind(this));
         document.addEventListener('keyup', this.onKeyUp.bind(this));
         document.addEventListener('mousemove', this.onMouseMove.bind(this));
+
         document.addEventListener('click', () => {
-            document.body.requestPointerLock();
+            if (!document.pointerLockElement) {
+                document.body.requestPointerLock();
+            }
+        });
+
+        document.addEventListener('pointerlockchange', () => {
+            if (document.pointerLockElement !== document.body) {
+                document.removeEventListener('mousemove', this.onMouseMove);
+            } else {
+                document.addEventListener('mousemove', this.onMouseMove.bind(this));
+            }
         });
     }
 
@@ -71,13 +84,13 @@ class Player {
         this.direction.normalize();
 
         if (this.keys.forward || this.keys.backward) {
-            this.velocity.z -= this.direction.z * this.moveSpeed * delta;
+            this.velocity.z = this.direction.z * this.moveSpeed * delta;
         } else {
             this.velocity.z = 0;
         }
 
         if (this.keys.left || this.keys.right) {
-            this.velocity.x -= this.direction.x * this.moveSpeed * delta;
+            this.velocity.x = this.direction.x * this.moveSpeed * delta;
         } else {
             this.velocity.x = 0;
         }
