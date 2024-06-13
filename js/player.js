@@ -17,20 +17,8 @@ class Player {
         document.addEventListener('keydown', this.onKeyDown.bind(this));
         document.addEventListener('keyup', this.onKeyUp.bind(this));
         document.addEventListener('mousemove', this.onMouseMove.bind(this));
-
-        document.addEventListener('click', () => {
-            if (!document.pointerLockElement) {
-                document.body.requestPointerLock();
-            }
-        });
-
-        document.addEventListener('pointerlockchange', () => {
-            if (document.pointerLockElement !== document.body) {
-                document.removeEventListener('mousemove', this.onMouseMove);
-            } else {
-                document.addEventListener('mousemove', this.onMouseMove.bind(this));
-            }
-        });
+        document.addEventListener('click', this.requestPointerLock.bind(this));
+        document.addEventListener('pointerlockchange', this.onPointerLockChange.bind(this));
     }
 
     onKeyDown(event) {
@@ -75,6 +63,22 @@ class Player {
             this.yaw.rotation.y -= event.movementX * this.turnSpeed;
             this.pitch.rotation.x -= event.movementY * this.turnSpeed;
             this.pitch.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, this.pitch.rotation.x));
+        }
+    }
+
+    requestPointerLock() {
+        if (!document.pointerLockElement) {
+            document.body.requestPointerLock();
+        }
+    }
+
+    onPointerLockChange() {
+        if (document.pointerLockElement === document.body) {
+            console.log('Pointer lock engaged.');
+            document.addEventListener('mousemove', this.onMouseMove.bind(this));
+        } else {
+            console.log('Pointer lock disengaged.');
+            document.removeEventListener('mousemove', this.onMouseMove.bind(this));
         }
     }
 
